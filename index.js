@@ -20,16 +20,22 @@ app.get("/", function (req, res) {
 
 // your first API endpoint... 
 app.get("/api/:date?", function (req, res) {
-  let dateTime = req.params.date;
+  const unixRegex = /^\d+$/;
+  const dateTime = req.params.date;
+  const formattedDate = new Date(unixRegex.test(dateTime)? Number(dateTime): dateTime);
   if (!dateTime) {
     let now = new Date();
     res.json({"unix": Date.parse(now), "utc": now.toUTCString()});
     return;
-  }
-  let unixRegex = /^\d+$/;
+  } 
+  else if (isNaN(formattedDate)){
+    res.json({ error : "Invalid Date" });
+    return;
+  } else {
   let unixFormat = unixRegex.test(dateTime)? dateTime : Date.parse(dateTime);
   let utcFormat = unixRegex.test(dateTime)? new Date(Number(dateTime)): new Date(dateTime);
-  res.json({"unix": unixFormat, "utc": utcFormat.toUTCString()});
+  res.json({"unix": Number(unixFormat), "utc": utcFormat.toUTCString()});
+}
 });
 
 
