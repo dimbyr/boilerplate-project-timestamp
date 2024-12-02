@@ -18,12 +18,19 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-
 // your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+app.get("/api/:date?", function (req, res) {
+  let dateTime = req.params.date;
+  if (!dateTime) {
+    let now = new Date();
+    res.json({"unix": Date.parse(now), "utc": now.toUTCString()});
+    return;
+  }
+  let unixRegex = /^\d+$/;
+  let unixFormat = unixRegex.test(dateTime)? dateTime : Date.parse(dateTime);
+  let utcFormat = unixRegex.test(dateTime)? new Date(Number(dateTime)): new Date(dateTime);
+  res.json({"unix": unixFormat, "utc": utcFormat.toUTCString()});
 });
-
 
 
 // Listen on port set in environment variable or default to 3000
